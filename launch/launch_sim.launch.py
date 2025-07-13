@@ -4,7 +4,7 @@ from ament_index_python.packages import get_package_share_directory
 
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node
@@ -52,12 +52,30 @@ def generate_launch_description():
         arguments=["joint_broad"],
     )
 
+    delayed_spawn_entity = TimerAction(
+        period=5.0,  # delay 5 seconds to make sure Gazebo and clock are ready
+        actions=[spawn_entity]
+    )
+
+    delayed_diff_drive_spawner = TimerAction(
+        period=7.0,
+        actions=[diff_drive_spawner]
+    )
+
+    delayed_joint_broad_spawner = TimerAction(
+        period=7.5,
+        actions=[joint_broad_spawner]
+    )
+
 
     # Launch them all!
     return LaunchDescription([
         rsp,
         gazebo,
-        spawn_entity,
-        diff_drive_spawner,
-        joint_broad_spawner,
+        # spawn_entity,
+        # diff_drive_spawner,
+        # joint_broad_spawner,
+        delayed_spawn_entity,
+        delayed_diff_drive_spawner,
+        delayed_joint_broad_spawner,
     ])
